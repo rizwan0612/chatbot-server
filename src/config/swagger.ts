@@ -5,12 +5,12 @@ const options: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'My TypeScript API',
+      title: 'RB Care API',
       version: '1.0.0',
-      description: 'API Documentation for TypeScript Project',
+      description: 'API Documentation for RB Care',
     },
     servers: [
-      { url: 'http://localhost:3002/api', description: 'Local Development' },
+      { url: 'http://localhost:3002', description: 'Development' },
     ],
     components: {
       securitySchemes: {

@@ -3,14 +3,22 @@ import pool from '../config/database';
 export interface User {
   id?: number;
   username: string;
-  password_hash: string;
-  email: boolean;
+  password: string;
+  email: string;
+  address: string;
+  phone: string;
   role_id: number;
   created_at?: Date;
   updated_at?: Date;
 }
 
 export class UserModel {
+
+    static async findByLoginId(user: User): Promise<User | null> {
+      const [rows] = await pool.query('SELECT * FROM user WHERE email = ? and password = ?' , [user.email, user.password]);
+      return (rows as User[])[0] || null;
+    }
+
     static async findAll(): Promise<User[]> {
       const [rows] = await pool.query('SELECT * FROM user');
       return rows as User[];
@@ -23,8 +31,8 @@ export class UserModel {
   
     static async create(user: User): Promise<User> {
       const [result] = await pool.query(
-        'INSERT INTO user (username, password_hash, email,role_id,created_at,updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-        [user.username, user.password_hash, user.email, user.role_id, user.created_at, user.updated_at]
+        'INSERT INTO user (username, password, email,role_id,created_at,updated_at,address,phone) VALUES (?,?, ?, ?, ?, ?, ?, ?)',
+        [user.username, user.password, user.email, user.role_id, user.created_at, user.updated_at, user.address,user.phone]
       );
       
       // Handle potential null with type assertion
@@ -38,8 +46,8 @@ export class UserModel {
   
     static async update(id: number, user: User): Promise<User> {
       await pool.query(
-        'UPDATE user SET username = ?, password_hash = ?, email = ?, role_id = ?, updated_at = ? WHERE user_id = ?',
-        [user.username, user.password_hash, user.email, user.role_id, user.updated_at, user.id]
+        'UPDATE user SET password = ?, role_id = ?, updated_at = ? WHERE user_id = ?',
+        [user.password, user.role_id, user.updated_at, id]
       );
       
       const updatedUser = await this.findById(id);

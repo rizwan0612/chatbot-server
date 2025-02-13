@@ -1,7 +1,8 @@
 import pool from '../config/database';
 
 export interface Patient {
-  patient_id?: number;
+  id?: number;
+  patient_number: string;
   first_name: string;
   last_name: string;
   date_of_birth: Date;
@@ -22,14 +23,14 @@ export class PatientModel {
     }
   
     static async findById(id: number): Promise<Patient | null> {
-      const [rows] = await pool.query('SELECT * FROM patients WHERE patient_id = ?', [id]);
+      const [rows] = await pool.query('SELECT * FROM patients WHERE id = ?', [id]);
       return (rows as Patient[])[0] || null;
     }
   
     static async create(patient: Patient): Promise<Patient> {
       const [result] = await pool.query(
-        'INSERT INTO patients (first_name, last_name, date_of_birth,gender,phone_number, address, email_address, emergency_contact_name, emergency_contact_number, created_at,updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?)',
-        [patient.first_name, patient.last_name, patient.date_of_birth, patient.gender, patient.address, patient.email_address, patient.phone_number, patient.emergency_contact_name, patient.emergency_contact_number, patient.created_at, patient.updated_at]
+        'INSERT INTO patients (first_name, last_name, date_of_birth,gender,phone_number, address, email_address, emergency_contact_name, emergency_contact_number, created_at,updated_at,patient_number) VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?)',
+        [patient.first_name, patient.last_name, patient.date_of_birth, patient.gender, patient.address, patient.email_address, patient.phone_number, patient.emergency_contact_name, patient.emergency_contact_number, patient.created_at, patient.updated_at, patient.patient_number]
       );
       
       // Handle potential null with type assertion
@@ -43,8 +44,8 @@ export class PatientModel {
   
     static async update(id: number, patient: Patient): Promise<Patient> {
       await pool.query(
-        'UPDATE patients SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address = ?, email_address=?, phone_number=?, emergency_contact_name=?, emergency_contact_number=?, updated_at=?  WHERE patient_id = ?',
-        [patient.first_name, patient.last_name, patient.date_of_birth, patient.gender, patient.address, patient.email_address, patient.phone_number, patient.emergency_contact_name, patient.emergency_contact_number, patient.updated_at, patient.patient_id]
+        'UPDATE patients SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, address = ?, email_address=?, phone_number=?, emergency_contact_name=?, emergency_contact_number=?, updated_at=?  WHERE id = ?',
+        [patient.first_name, patient.last_name, patient.date_of_birth, patient.gender, patient.address, patient.email_address, patient.phone_number, patient.emergency_contact_name, patient.emergency_contact_number, patient.updated_at, id]
       );
       
       const updatedUser = await this.findById(id);
@@ -56,6 +57,6 @@ export class PatientModel {
     }
   
     static async delete(id: number): Promise<void> {
-      await pool.query('DELETE FROM patients WHERE patient_id = ?', [id]);
+      await pool.query('DELETE FROM patients WHERE id = ?', [id]);
     }
   }

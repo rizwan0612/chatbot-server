@@ -8,6 +8,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "removeComments": false  // Critical for Swagger JSDoc annotations!
+    "removeComments": false,  // Critical for Swagger JSDoc annotations!,
   }
 }
