@@ -1,0 +1,36 @@
+{
+  "name": "rbcare",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts --exec \"ts-node\" src/server.ts",
+    "qa": "cross-env NODE_ENV=qa nodemon --watch src/**/*.ts --exec \"ts-node\" src/server.ts",
+    "staging": "cross-env NODE_ENV=staging nodemon --watch src/**/*.ts --exec \"ts-node\" src/server.ts",
+    "prod": "cross-env NODE_ENV=production npm run build && node dist/server.js",
+    "start": "npm run prod",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.17.17",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.7",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
