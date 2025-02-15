@@ -1,95 +1,46 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import axios from 'axios';
-import dotenv from 'dotenv';
-import OpenAI from "openai";
+import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai'; //Import GenerativeModel
+import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config(); // Load environment variables from .env
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors());  // Enable Cross-Origin Resource Sharing
+app.use(express.json()); // Parse JSON request bodies
 
- const DEEPSEEK_API_KEY = 'TESTA';
+const apiKey = process.env.GEMINI_API_KEY; // Get API key from environment variables
 
+if (!apiKey) {
+    console.error("GEMINI_API_KEY is missing.  Set it in your .env file.");
+    process.exit(1); // Exit if the API key is not set
+}
 
-// const openai = new OpenAI({
-//   apiKey: "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",
-// });
+const genAI = new GoogleGenerativeAI(apiKey);
 
-// const completion = openai.chat.completions.create({
-//   model: "gpt-4o-mini",
-//   //content: "You are a supply chain expert. Provide detailed answers about inventory management, logistics optimization, procurement strategies, and demand forecasting. Use industry terminology and suggest actionable insights.",
-//   store: true,
-//   messages: [
-//     {"role": "user", "content": "write a haiku about ai"},
-//   ],
-// });
+// Call getModel as a method on the genAI instance, and explicitly specify the type
+const model: GenerativeModel = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-// completion.then((result) => console.log(result.choices[0].message));
+app.post('/api/generate', async (req: Request, res: Response) => {
+    try {
+        const prompt = req.body.prompt;
 
-app.post('/api/chat', async (req: Request, res: Response) => {
-  try {
-    const userMessage = req.body.message;
-    
-    const response = await axios.post(
-      'https://api.deepseek.com/v1/chat/completions',
-      {
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "system",
-            content: "You are a supply chain expert. Provide detailed answers about inventory management, logistics optimization, procurement strategies, and demand forecasting. Use industry terminology and suggest actionable insights."
-          },
-          {
-            role: "user",
-            content: userMessage
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-          'Content-Type': 'application/json'
+        if (!prompt) {
+            return res.status(400).json({ error: "Prompt is required" });
         }
-      }
-    );
 
-    res.json({
-      reply: response.data.choices[0].message.content
-    });
+        const result = await model.generateContent(prompt); // Use the model instance
+        const responseText = result.response.text();
+        res.json({ response: responseText });
 
-  } catch (error) {
-    console.error('DeepSeek API Error:', error);
-    res.status(500).json({ error: 'Chat processing failed' });
-  }
+    } catch (error: any) {
+        console.error("Error generating content:", error);
+        res.status(500).json({ error: `Failed to generate content: ${error.message}` });
+    }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
-
-// // server/src/index.ts (updated)
-// app.post('/api/chat', async (req, res) => {
-//     try {
-//       const { messages } = req.body;
-      
-//       const response = await axios.post(
-//         'http://localhost:11434/api/generate', // Ollama endpoint
-//         {
-//           model: "llama3", // Your chosen model
-//           content: "You are a supply chain expert. Provide detailed answers about inventory management, logistics optimization, procurement strategies, and demand forecasting. Use industry terminology and suggest actionable insights.",
-//           prompt: messages[messages.length - 1].content,
-//           stream: false, // Set to true for real-time streaming
-//         }
-//       );
-  
-//       res.json({ content: response.data.response });
-//     } catch (error) {
-//       res.status(500).json({ error: 'Ollama Error' });
-//     }
-//   });
