@@ -21,7 +21,7 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Call getModel as a method on the genAI instance, and explicitly specify the type
-const model: GenerativeModel = genAI.getGenerativeModel({ model: "gemini-pro"});
+const model: GenerativeModel = genAI.getGenerativeModel({ model: "gemini-2.0-pro-exp-02-05" });
 
 app.post('/api/generate', async (req: Request, res: Response) => {
     try {
