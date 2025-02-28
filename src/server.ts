@@ -3,10 +3,11 @@ import { GoogleGenerativeAI, Content } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import { z } from 'zod';
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3002;
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -18,9 +19,23 @@ interface ChatSession {
   history: Content[];
 }
 
+
+
 const chatSessions = new Map<string, ChatSession>();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
+// Zod validation schema
+const chatSchema = z.object({
+  sessionId: z.string().min(1),
+  message: z.string().min(1).max(1000)
+});
+
+// Configure CORS properly
+app.use(cors({
+  origin: process.env.CORS_ORIGIN,
+  methods: ['POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
 const limiter = rateLimit({
@@ -30,11 +45,18 @@ const limiter = rateLimit({
 
 app.post('/api/chat', limiter, async (req, res) => {
   try {
-    const { sessionId, message } = req.body;
 
-    if (!sessionId || !message) {
-      return res.status(400).json({ error: 'Missing sessionId or message' });
+    // Validate request body
+    const validation = chatSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({
+        error: 'Invalid request format',
+        details: validation.error.issues
+      });
     }
+
+    const { sessionId, message } = validation.data;
+
 
     // Get or create session
     let session = chatSessions.get(sessionId);
