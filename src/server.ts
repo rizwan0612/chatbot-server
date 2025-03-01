@@ -119,5 +119,3 @@ app.listen(port, () => {
     - Local: http://localhost:${port}
     - Network: http://10.0.0.92:${port}`);
 });
-
-//app.listen(port, () => console.log(`Server running on port ${port}`));
