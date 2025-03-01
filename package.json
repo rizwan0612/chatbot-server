@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "start:prod": "NODE_ENV=production node dist/server.js",
     "dev": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts --exec \"ts-node\" src/server.ts",
     "devchat": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts --exec \"ts-node\" src/chatbotServer.ts",
     "devcht": "cross-env NODE_ENV=development nodemon --watch src/**/*.ts --exec \"ts-node\" src/ollamaServer.ts",
@@ -10,8 +13,7 @@
     "staging": "cross-env NODE_ENV=staging nodemon --watch src/**/*.ts --exec \"ts-node\" src/server.ts",
     "prod": "cross-env NODE_ENV=production npm run build && node dist/server.js",
     "start": "npm run dev",
-    "startchat": "npm run devchat",
-    "build": "tsc"
+    "startchat": "npm run devchat"
   },
   "keywords": [],
   "author": "",
@@ -35,13 +37,14 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/multer": "^1.4.7",
-    "@types/node": "^20.17.19",
+    "@types/node": "^20.17.22",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",
     "cross-env": "^7.0.3",
     "nodemon": "^3.1.9",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.2"
   },
   "repository": {
     "type": "git",

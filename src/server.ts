@@ -114,4 +114,10 @@ app.post('/api/chat', limiter, async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () => {
+  console.log(`Server running at:
+    - Local: http://localhost:${port}
+    - Network: http://10.0.0.92:${port}`);
+});
+
+//app.listen(port, () => console.log(`Server running on port ${port}`));
